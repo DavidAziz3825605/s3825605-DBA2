@@ -185,8 +185,8 @@ public class BTree<Key extends Comparable<Key>, Value>  {
      */
     public String toString() {
         try {
-
-            return toString(root, height, "") + "\n";
+            DataOutputStream writer = new DataOutputStream(new FileOutputStream("index.4096"));
+            return toString(root, height, "",writer) + "\n";
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -194,12 +194,19 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         return  "ok";
     }
 
-    private String toString(Node h, int ht, String indent) throws IOException {
+    private String toString(Node h, int ht, String indent,DataOutputStream os) throws IOException {
         StringBuilder s = new StringBuilder();
         Entry[] children = h.children;
 
         if (ht == 0) {
+
             for (int j = 0; j < h.m; j++) {
+                os.writeLong((Long) children[j].key);
+                os.writeBoolean(h.isLeaf);
+                String child = (String) h.children[j].val;
+                String[] result = child.split(",");
+                os.writeInt(Integer.parseInt(result[0]));
+                os.writeInt(Integer.parseInt(result[1]));
                 s.append(indent + children[j].key);
             }
         }
@@ -207,9 +214,13 @@ public class BTree<Key extends Comparable<Key>, Value>  {
             for (int j = 0; j < h.m; j++) {
 
                 if (j > 0) {
+
+                    os.writeLong((Long) children[j].key);
+                    os.writeBoolean(h.isLeaf);
+
                     s.append(indent + "(" + children[j].key + h.isLeaf + ")\n");
                 }
-                s.append(toString(children[j].next, ht-1, indent + "     "));
+                s.append(toString(children[j].next, ht-1, indent + "     ",os));
             }
         }
         return s.toString();
