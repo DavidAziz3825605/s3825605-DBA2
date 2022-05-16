@@ -2,6 +2,7 @@ import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+
 public class BTree<Key extends Comparable<Key>, Value>  {
     // max children per B-tree node = M-1
     // (must be even and greater than 2)
@@ -144,6 +145,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
                 }
             }
         }
+
         // internal node
         else {
             h.isLeaf=false;
@@ -175,6 +177,43 @@ public class BTree<Key extends Comparable<Key>, Value>  {
             t.children[j] = h.children[M/2+j];
         return t;
     }
+
+    /**
+     * Returns a string representation of this B-tree (for debugging).
+     *
+     * @return a string representation of this B-tree.
+     */
+    public String toString() {
+        try {
+
+            return toString(root, height, "") + "\n";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return  "ok";
+    }
+
+    private String toString(Node h, int ht, String indent) throws IOException {
+        StringBuilder s = new StringBuilder();
+        Entry[] children = h.children;
+
+        if (ht == 0) {
+            for (int j = 0; j < h.m; j++) {
+                s.append(indent + children[j].key);
+            }
+        }
+        else {
+            for (int j = 0; j < h.m; j++) {
+
+                if (j > 0) {
+                    s.append(indent + "(" + children[j].key + h.isLeaf + ")\n");
+                }
+                s.append(toString(children[j].next, ht-1, indent + "     "));
+            }
+        }
+        return s.toString();
+    }
     // comparison functions - make Comparable instead of Key to avoid casts
     private boolean less(Comparable k1, Comparable k2) {
         return k1.compareTo(k2) < 0;
@@ -203,6 +242,7 @@ public class BTree<Key extends Comparable<Key>, Value>  {
         bpt.put(9, 9);
         bpt.put(10, 10);
         bpt.put(11, 11);
+
         System.out.println("size:    " + bpt.size());
         System.out.println("height:  " + bpt.height());
         System.out.println(bpt);
