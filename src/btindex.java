@@ -16,7 +16,7 @@ public class btindex {
 
         int pageSize = getPageSize(args);
         String fileName= getFileName(args);
-        System.out.println("File"+fileName);
+        System.out.println("fileeeeee"+fileName);
         String[] result = fileName.split(".");
 
         int acturlIndexSize = Integer.parseInt(result[1]);
@@ -25,17 +25,25 @@ public class btindex {
             System.out.println("page size must be  same as index page size"+ acturlIndexSize +" "+ pageSize);
             System.exit(0);
         }
+
+
         int recordSizeLength = 256;
         int recordSizeLengthOnIndexFile = 17;
+
+
         // add its path here
         File heapFile = new File("src/"+fileName);
+
         RandomAccessFile RandomAccessFile = new RandomAccessFile(heapFile, "r");
+
         Path path = Paths.get("src/"+fileName);
         byte[] bytes = Files.readAllBytes(path);
         long  count = bytes.length;
         int numberofpages = (int) (count/pageSize);
         int counter=0;
         int sizeOfNode = pageSize/recordSizeLengthOnIndexFile;
+        BTree<Long, String> bpt;
+        bpt = new BTree<>(128);
 
         for (int j=0;j< numberofpages;j++)
         {
@@ -61,15 +69,19 @@ public class btindex {
                     int record=  counter - ((counter / j) * j);
                     n =   j+","+ record;
                 }
-                //System.out.println("record number:"+ counter);
+
+                bpt.put(test, n);
+                //   System.out.println("record number:"+ counter);
                 counter++;
             }
         }
         RandomAccessFile.close();
-        System.out.println("Number of records indexed :    "    );
-        System.out.println("Number of index pages created:  "  );
-        System.out.println("The tree height:  " );
+        System.out.println("Number of records indexed :    " + bpt.size());
+        System.out.println("Number of index pages created:  " + bpt.height());
+        System.out.println("The tree height:  " + bpt.height());
         DataOutputStream writer = new DataOutputStream(new FileOutputStream("heap." + pageSize));
+        System.out.println(bpt.toString());
+        System.out.println();
         long endingT = System.nanoTime();
         long totalTime = (endingT - initialT) / 1000000;
         System.out.println("File is created in: " + totalTime + "ms");
@@ -103,4 +115,3 @@ public class btindex {
         return new BigInteger(bytes).longValue();
     }
 }
-
